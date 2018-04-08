@@ -12,8 +12,9 @@ var CalendarFW = {};
         var target = document.getElementById(target_container);
 
         //Calculation info
-        var day_count = 31;
-        var offset = 0;
+        var date = new Date();
+        var day_count = getMonthInfo();
+        var offset = calculateOffset();
 
         //Styling info (Class Names / Element IDs)
         // Base Calendar
@@ -28,16 +29,21 @@ var CalendarFW = {};
         var todoInputTextFieldClass = "todoListInput"
         var todoListULClass = "itemList";
         var toDoListHeaderID = "todoListHeader";
+        var closeBtnClass = "close";
 
         var calendar_table = createTable();
         addDays(calendar_table);
 
         target.appendChild(calendar_table);
 
-        
-
-
         // Utility Functions
+        function calculateOffset (){
+            return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+        }
+
+        function getMonthInfo (){
+            return new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
+        }
 
         function createTable(){
             //TODO variable name length ("Sun" vs "Sunday" vs "S");
@@ -77,7 +83,7 @@ var CalendarFW = {};
                     //Define innerHTML
                     if( counter < offset){
                         // Pad beginning of month if necessary
-                        td.innerHTML = "0" ;
+                        td.innerHTML = "" ;
                     }else{
                         td.innerHTML = "" + (counter-offset+1);
                         td.className= tableDayClass;
@@ -103,7 +109,6 @@ var CalendarFW = {};
 
         var clickDay = function (){
             //Unset any elements we will be needing
-            console.log("Clicked " + this.innerText);
             switchActiveDay();
             clearSpacers();
     
@@ -153,7 +158,6 @@ var CalendarFW = {};
         function clearSpacers(){
             //Clear all spacer elements of eontent
             var container = my$(calendar.container_name);
-            console.log(calendar.container_name);
             var spacers = container.getElementsByClassName(spacerClass);
             for (var i = 0; i < spacers.length; i++){
                 spacers[i].innerHTML ="";
@@ -216,11 +220,11 @@ var CalendarFW = {};
     
             var span = document.createElement("span");
             var txt = document.createTextNode("\u00D7");
-            span.className = "close";
+            span.className = closeBtnClass;
             span.appendChild(txt);
             li.appendChild(span);
     
-            var close = document.getElementsByClassName("close");
+            var close = document.getElementsByClassName(closeBtnClass);
             for (i = 0; i < close.length; i++) {
                 close[i].onclick = function() {
                     var list = container.getElementsByClassName(todoListULClass)[0];
@@ -235,7 +239,6 @@ var CalendarFW = {};
         }
     
         function loadElement(obj){
-            //TODO data validation
             //Obj should be a single list item with properties:
             //  name, class
             var container = my$(calendar.container_name);
@@ -247,15 +250,15 @@ var CalendarFW = {};
     
             var span = document.createElement("span");
             var txt = document.createTextNode("\u00D7");
-            span.className = "close";
+            span.className = closeBtnClass;
             span.appendChild(txt);
             li.appendChild(span);
     
     
-            var close = document.getElementsByClassName("close");
+            var close = document.getElementsByClassName(closeBtnClass);
             for (i = 0; i < close.length; i++) {
                 close[i].onclick = function() {
-                    var list = container.getElementsByClassName(todoListULClass);
+                    var list = container.getElementsByClassName(todoListULClass)[0];
                     list.removeChild(this.parentElement);
                     //Save on List item deleted
                     saveDayList();
@@ -331,7 +334,6 @@ var CalendarFW = {};
         }
 
         var days = target.getElementsByClassName(tableDayClass);
-        console.log(days.length)
         for(var i = 0; i < days.length; i++){
             days[i].onclick = clickDay;
         }
